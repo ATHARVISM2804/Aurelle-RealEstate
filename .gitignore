@@ -1,0 +1,24 @@
+# local data and working files
+leads/
+.DS_Store
+.vercel/
+
+# reference recording and planning notes (not part of the site)
+download (3).mp4
+PLAN.md
+
+# raw generator outputs and backups (large; kept locally)
+assets/raw/
+assets/seq-old/
+assets/img-v2-backup/
+assets/img-stock/
+assets/img/*.jpg
+
+# superseded frame sets (the site uses assets/seq/<film>/{hd,sd}/*.avif)
+assets/seq/descent/
+assets/seq/rise/
+assets/seq/enter/
+assets/seq/hero/*.webp
+assets/seq/hero/manifest.json
+assets/seq/tour/*.webp
+assets/seq/tour/manifest.json

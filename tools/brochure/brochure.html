@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Aurelle Residence — Brochure</title>
+<!-- Printed to assets/brochure/Aurelle-Residence-Brochure.pdf by tools/brochure/make-brochure.cjs -->
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  @page { size: 297mm 210mm; margin: 0; }
+  :root { --cream: #f2eee7; --paper: #f7f4ef; --ink: #1b1a17; --grey: #8f8a80; --green: #1e2722; --white: #f4f1ea; --line: rgba(27,26,23,.14); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Inter, sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 297mm; height: 210mm; position: relative; overflow: hidden; page-break-after: always; background: var(--paper); }
+  .page:last-child { page-break-after: auto; }
+  img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .serif { font-family: "Instrument Serif", serif; font-weight: 400; line-height: .95; }
+  .eyebrow { font-size: 7.5pt; letter-spacing: .24em; text-transform: uppercase; font-weight: 500; }
+  .dim { opacity: .55; }
+  .num { position: absolute; right: 14mm; bottom: 10mm; font-size: 7pt; letter-spacing: .2em; opacity: .5; }
+  .dark { background: var(--green); color: var(--white); }
+  .full { position: absolute; inset: 0; }
+  .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,8,.62), rgba(8,8,8,0) 50%); }
+  .emblem { fill: none; stroke: currentColor; stroke-width: 2; }
+  p.body { font-size: 9.5pt; line-height: 1.75; color: #5f5a51; max-width: 92mm; }
+  .dark p.body { color: rgba(244,241,234,.75); }
+
+  /* cover */
+  .cover { color: #fff; }
+  .cover .full img { filter: brightness(.82); }
+  .cover .mark { position: absolute; left: 0; right: 0; top: 50mm; text-align: center; }
+  .cover .mark .emblem { width: 22mm; height: 27mm; stroke-width: 1.6; }
+  .cover h1 { font-family: "Instrument Serif", serif; font-weight: 400; font-size: 64pt; letter-spacing: .16em; margin-top: 10mm; }
+  .cover .mark p { margin-top: 4mm; }
+  .cover .foot { position: absolute; left: 16mm; right: 16mm; bottom: 12mm; display: flex; justify-content: space-between; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; height: 100%; }
+  .split .text { padding: 26mm 20mm; display: flex; flex-direction: column; justify-content: center; gap: 7mm; }
+  .split h2 { font-size: 44pt; }
+  .split h2 em { display: block; }
+
+  .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6mm; position: absolute; left: 16mm; right: 16mm; bottom: 16mm; color: #fff; }
+  .facts b { font-family: "Instrument Serif", serif; font-weight: 400; font-size: 34pt; display: block; line-height: 1; }
+  .facts span { font-size: 7.5pt; letter-spacing: .2em; text-transform: uppercase; opacity: .8; }
+  .title-over { position: absolute; left: 16mm; top: 16mm; color: #fff; }
+  .title-over h2 { font-size: 48pt; margin-top: 4mm; }
+
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4mm; position: absolute; left: 16mm; right: 16mm; top: 64mm; bottom: 16mm; }
+  .grid4 figure { display: flex; flex-direction: column; gap: 3mm; }
+  .grid4 .ph { flex: 1; overflow: hidden; }
+  .grid4 .arch { border-radius: 999px 999px 0 0; }
+  .head { position: absolute; left: 16mm; top: 18mm; right: 16mm; display: flex; justify-content: space-between; align-items: flex-end; }
+  .head h2 { font-size: 40pt; margin-top: 3mm; }
+
+  .unit { display: grid; grid-template-columns: 74mm 1fr; grid-template-rows: 210mm; height: 210mm; }
+  .unit .side { background: var(--green); color: var(--white); padding: 18mm 12mm; display: flex; flex-direction: column; }
+  .unit .side h2 { font-size: 30pt; margin: 4mm 0 2mm; }
+  .unit dl { display: grid; grid-template-columns: 1fr auto; gap: 2.5mm 4mm; font-size: 8pt; margin-top: 10mm; padding-top: 6mm; border-top: 1px solid rgba(244,241,234,.18); }
+  .unit dt { opacity: .6; letter-spacing: .12em; text-transform: uppercase; font-size: 7pt; }
+  .unit .price { margin-top: auto; }
+  .unit .price b { font-family: "Instrument Serif", serif; font-weight: 400; font-size: 26pt; display: block; margin-top: 2mm; }
+  .unit .plans { background: #fff; display: grid; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); padding: 8mm 12mm; gap: 4mm; min-height: 0; }
+  .unit .plans img { object-fit: contain; min-height: 0; }
+
+  .amen { position: absolute; left: 16mm; right: 16mm; top: 52mm; bottom: 14mm; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: 1fr 1fr; gap: 3mm; }
+  .amen figure { position: relative; overflow: hidden; }
+  .amen figcaption { position: absolute; left: 3mm; bottom: 3mm; right: 3mm; color: #fff; font-size: 7pt; letter-spacing: .14em; text-transform: uppercase; }
+  .amen figure::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.5), transparent 50%); }
+  .amen figcaption { z-index: 1; }
+
+  .back { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6mm; }
+  .back .emblem { width: 16mm; height: 20mm; stroke-width: 1.8; }
+  .back h2 { font-size: 46pt; }
+  .back h2 em { display: block; }
+  .back .contact { display: flex; gap: 14mm; font-size: 9pt; margin-top: 6mm; }
+  .back .legal { position: absolute; bottom: 12mm; left: 20mm; right: 20mm; font-size: 6.5pt; line-height: 1.6; opacity: .5; }
+</style>
+</head>
+<body>
+<template id="emblem"><svg class="emblem" viewBox="-2 6 104 128"><path d="M10 130V50a40 40 0 0 1 80 0v80"/><path d="M12 130 50 10l38 120M26 130l24-82 24 82M12 130h14m48 0h14M24 92h52"/></svg></template>
+
+<section class="page cover">
+  <div class="full"><img src="../../assets/img/hero-clouds.webp" alt=""></div>
+  <div class="mark"><i data-emblem></i><h1>AURELLE</h1><p class="eyebrow">Residence · Al Furjan, Dubai</p></div>
+  <div class="foot"><span class="eyebrow">A luxurious lifestyle awaits you</span><span class="eyebrow">Halden Properties</span></div>
+</section>
+
+<section class="page">
+  <div class="split">
+    <div><img src="../../assets/img/tower-portrait.webp" alt=""></div>
+    <div class="text">
+      <p class="eyebrow dim">01 — Introduction</p>
+      <h2 class="serif">A slower kind <em>of everyday.</em></h2>
+      <p class="body">Aurelle is a residence of sixteen levels in Al Furjan, drawn around light, proportion and the quiet rituals of home. One, two, three and four-bedroom residences rise above a landscaped podium of twelve amenities, a short walk from the metro and minutes from the Marina.</p>
+      <p class="body">Every detail, from 3.65 m ceilings to Italian finishes and a single-panel smart home, is chosen for how it will feel in ten years, not ten days.</p>
+    </div>
+  </div>
+  <span class="num">02</span>
+</section>
+
+<section class="page dark">
+  <div class="full"><img src="../../assets/img/tower-dusk.webp" alt=""></div>
+  <div class="shade"></div>
+  <div class="title-over"><p class="eyebrow">02 — The tower</p><h2 class="serif">Ready to rise.</h2></div>
+  <div class="facts"><div><b>16</b><span>Levels</span></div><div><b>5</b><span>Residence types</span></div><div><b>12</b><span>Podium amenities</span></div><div><b>3.65 m</b><span>Ceiling heights</span></div></div>
+  <span class="num" style="color:#fff">03</span>
+</section>
+
+<section class="page dark">
+  <div class="split">
+    <div class="text">
+      <p class="eyebrow dim">03 — Location</p>
+      <h2 class="serif">Your world. <em>Within reach.</em></h2>
+      <p class="body">Al Furjan sits between the Marina and the city's new airport, a connected community of parks, schools and everyday conveniences.</p>
+      <div class="facts" style="position:static;grid-template-columns:1fr 1fr;color:inherit;margin-top:4mm;row-gap:7mm">
+        <div><b>05</b><span>min · Al Furjan Metro</span></div><div><b>05</b><span>min · Dubai Marina</span></div>
+        <div><b>12</b><span>min · Ibn Battuta Mall</span></div><div><b>25</b><span>min · Al Maktoum Int'l</span></div>
+      </div>
+    </div>
+    <div><img src="../../assets/img/aerial-green.webp" alt=""></div>
+  </div>
+  <span class="num">04</span>
+</section>
+
+<section class="page">
+  <div class="head"><div><p class="eyebrow dim">04 — Interiors</p><h2 class="serif">Step inside the everyday.</h2></div><p class="body" style="max-width:80mm">Four rooms, and the life they are drawn around.</p></div>
+  <div class="grid4">
+    <figure><div class="ph arch"><img src="../../assets/img/room-living-1600.webp" alt=""></div><p class="eyebrow">The living room</p></figure>
+    <figure><div class="ph arch"><img src="../../assets/img/room-kitchen-1600.webp" alt=""></div><p class="eyebrow">The kitchen</p></figure>
+    <figure><div class="ph arch"><img src="../../assets/img/room-bedroom-1600.webp" alt=""></div><p class="eyebrow">The bedroom</p></figure>
+    <figure><div class="ph arch"><img src="../../assets/img/room-bathroom-1600.webp" alt=""></div><p class="eyebrow">The bathroom</p></figure>
+  </div>
+  <span class="num">05</span>
+</section>
+
+<div id="units"></div>
+
+<section class="page" id="amenPage">
+  <div class="head"><div><p class="eyebrow dim">06 — The amenity collection</p><h2 class="serif">Twelve ways to spend a day.</h2></div><p class="body" style="max-width:80mm">Everything sits on the podium, a lift ride from your door.</p></div>
+  <div class="amen" id="amenGrid"></div>
+</section>
+
+<section class="page">
+  <div class="split">
+    <div><img src="../../assets/img/sauna.webp" alt=""></div>
+    <div class="text">
+      <p class="eyebrow dim">07 — Wellness</p>
+      <h2 class="serif">Time to <em>exhale.</em></h2>
+      <p class="body">A yoga studio of soft light and sprung floors, a gym with the skyline as its mirror, a steam room with personal lockers and an open-sky jacuzzi. A curated collection of spaces for movement, stillness and everything in between.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page dark back">
+  <i data-emblem></i>
+  <p class="eyebrow dim">Your next chapter</p>
+  <h2 class="serif">Let's talk <em>about Aurelle.</em></h2>
+  <div class="contact"><span>hello@haldenproperties.example</span><span>+971 4 000 0000</span><span>Sales gallery · Al Furjan, Dubai</span></div>
+  <p class="legal">All images are AI-generated artist impressions, for illustration only. Plans, areas, prices and availability are indicative, subject to change and do not form part of any contract. Prices shown are starting prices for the lowest available level. Halden Properties.</p>
+</section>
+
+<script src="../../js/plates.js"></script>
+<script src="../../js/config.js"></script>
+<script>
+  document.querySelectorAll('[data-emblem]').forEach((n) => n.replaceWith(document.getElementById('emblem').content.cloneNode(true)));
+  // one page per residence type, from the same data the site's explorer uses
+  const TYPES = [
+    ['oneBhk', '1 BHK', 'Typical floors', 'C'], ['oneBhkStudy', '1 BHK + Study', 'Typical floors', 'B'], ['twoBhk', '2 BHK + Maid Room', 'Typical floors', 'A'],
+    ['threeBhk', '3 BHK Penthouse with Jacuzzi', 'Levels 15 & 16', 'P3'], ['fourBhk', '4 BHK Penthouse with Jacuzzi', 'Levels 15 & 16', 'P1'],
+  ];
+  const all = [...FLOOR_PLATES.typical.units, ...FLOOR_PLATES.penthouse.units];
+  const aed = (v) => `${INVENTORY.currency} ${(v / 1e6).toFixed(2)}M`;
+  document.getElementById('units').outerHTML = TYPES.map(([key, name, where, id], i) => {
+    const u = all.find((x) => x.id === id), p = UNIT_PLANS[key];
+    const rooms = (UNIT_ROOMS[key] || []).map((r) => r.name || ROOM_TYPES[r.type].name);
+    return `<section class="page"><div class="unit">
+      <div class="side"><p class="eyebrow dim">05 — Residences · ${i + 1} of ${TYPES.length}</p><h2 class="serif">${name}</h2><p class="eyebrow dim">${where}</p>
+        <dl><dt>Apartment</dt><dd>${u.areas[0]} sq ft</dd><dt>Balcony / terrace</dt><dd>${u.areas[1]} sq ft</dd><dt>Total</dt><dd>${u.areas[2]} sq ft</dd></dl>
+        <p class="body" style="margin-top:8mm;font-size:8pt">${rooms.join(' · ')}</p>
+        <div class="price"><p class="eyebrow dim">Starting from</p><b>${aed(INVENTORY.from[key])}</b></div></div>
+      <div class="plans"><img src="../../assets/img/${p.d2}-1600.webp" alt=""><img src="../../assets/img/${p.d3}-1600.webp" alt=""></div>
+    </div><span class="num">${String(6 + i).padStart(2, '0')}</span></section>`;
+  }).join('');
+  const AM = [['Zen Garden', 'garden-vertical'], ['Yoga Studio', 'yoga'], ['Gym', 'gym-equipment'], ['Walking Track', 'track'], ['Swimming Pool', 'pool-deck'], ['Steam Room', 'sauna'],
+    ['Social Terrace', 'terrace-social'], ['Jacuzzi', 'jacuzzi'], ['Outdoor Gym', 'outdoor-gym'], ['Kids Play Area', 'kids-play'], ['Padel Court', 'padel'], ['Cricket Simulator', 'cricket']];
+  document.getElementById('amenGrid').innerHTML = AM.map(([t, f]) => `<figure><img src="../../assets/img/${f}-1600.webp" alt=""><figcaption>${t}</figcaption></figure>`).join('');
+</script>
+</body>
+</html>
