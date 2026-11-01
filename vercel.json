@@ -11,7 +11,7 @@
   "rewrites": [
     { "source": "/api/p/:path*", "destination": "/api/public?r=:path*" },
     { "source": "/api/a/:path*", "destination": "/api/admin?r=:path*" },
-    { "source": "/dashboard/:path*", "destination": "/dashboard/index.html" }
+    { "source": "/dashboard/:path*", "destination": "/dashboard" }
   ],
   "redirects": [
     { "source": "/(package\\.json|package-lock\\.json)", "destination": "/", "permanent": false }
