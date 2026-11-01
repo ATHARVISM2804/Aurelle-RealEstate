@@ -28,13 +28,13 @@ const BUSY = {
 };
 
 export async function POST(request) {
-  let body, project, session, token, visitor;
-  const ipH = ipHash(request);
+  let body, project, session, token, visitor, ipH;
   try {
     // not set up yet on this deployment: the site tells the visitor to reach the sales team instead
     if (!process.env.DATABASE_URL || !hasModelKey() || (process.env.VERCEL && (!process.env.CHAT_TOKEN_SECRET || !process.env.TURNSTILE_SECRET))) {
       throw new HttpError(503, 'not_configured', 'The assistant is being set up.');
     }
+    ipH = ipHash(request);   // needs the secret, so only after the configuration check (inside the error handling)
     body = await readJson(request, 24 * 1024);
     const text = clean(body.text, LIMITS.maxChars + 1);
     if (!text) throw new HttpError(400, 'empty');
