@@ -9,6 +9,19 @@ window.AURELLE = {
   // and by tools/serve.py locally (which writes leads/leads.csv).
   enquiryEndpoint: '/api/enquiry',
   brochure: 'assets/brochure/Aurelle-Residence-Brochure.pdf',
+  // which project this site is in the leads database (data/projects/<project>)
+  project: 'aurelle',
+  // AI assistant ("Ask Aurelle"). Switch on once the Vercel project has DATABASE_URL, GROQ_API_KEY,
+  // CHAT_TOKEN_SECRET and TURNSTILE_SECRET (it is always on at localhost). At the same time, replace the
+  // Turnstile key below — Cloudflare's always-pass test key — with your real site key.
+  assistant: {
+    enabled: false,
+    name: 'Aurelle',
+    endpoint: '/api/chat',
+    api: '/api/p',
+    turnstileSiteKey: '1x00000000000000000000AA',
+    phone: '+971 4 000 0000',
+  },
 };
 
 /* Prices and availability. Sample figures: replace with the live sales sheet. */

@@ -38,6 +38,9 @@
     return `${INV.currency} ${(v / 1e6).toFixed(2)}M`;
   }
   const STATUS = { sold: 'Sold', reserved: 'Reserved', available: 'Available' };
+  // what the visitor explores, for the assistant and lead tracking (js/track.js listens)
+  const emit = (type, detail) => document.dispatchEvent(new CustomEvent('aurelle:' + type, { detail }));
+  const code = (n, u) => pad(n) + '-' + u.id;
 
   function levelInfo(n) {
     const pent = n >= PENTHOUSE_FROM;
@@ -140,6 +143,7 @@
       this.busy = true;
       window.lenis && window.lenis.stop();
       this.fillFloor(n);
+      emit('explorer_opened', { level: n });
       const fromY = (beamY ?? innerHeight / 2) - innerHeight / 2;
       gsap.set(this.root, { visibility: 'visible', opacity: 1 });
       gsap.set('#floorView', { visibility: 'visible', opacity: 1 });
@@ -148,7 +152,7 @@
       gsap.set('#plateImg', { filter: 'none' });
       gsap.timeline()
         .add(() => { this.busy = false; }, 1.15) // units clickable as soon as the plate has landed
-        .fromTo('.explorer__bg', { filter: 'brightness(1) saturate(1)' }, { filter: 'brightness(.22) saturate(.6)', duration: 1, ease: 'power2.inOut' }, 0)
+        .fromTo('.explorer__dim', { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power2.inOut' }, 0)
         .fromTo('.explorer__grid', { opacity: 0 }, { opacity: 1, duration: .8 }, .3)
         .fromTo(this.plateEl,
           { y: fromY, rotateX: 74, scale: .46, opacity: 0 },
@@ -163,6 +167,7 @@
     switchLevel(n) {
       if (this.busy) return this.whenFree(() => this.switchLevel(n));
       if (n === this.level) return;
+      emit('level_switched', { level: n });
       if (this.unit) this.backToFloor(true);
       const up = n > this.level;
       gsap.timeline()
@@ -175,6 +180,7 @@
     close() {
       if (this.busy) return this.whenFree(() => this.close());
       this.busy = true;
+      emit('explorer_closed', {});
       gsap.timeline({ onComplete: () => {
         gsap.set([this.root, '#floorView', '#unitView', this.stage], { visibility: 'hidden' });
         this.unit = null; this.busy = false;
@@ -183,7 +189,7 @@
         .to('#floorView .xp-head > *, .plate__tag, #floorCaption, #rulerXp', { opacity: 0, duration: .3 })
         .to(this.plateEl, { rotateX: 74, scale: .46, opacity: 0, duration: .9, ease: 'expo.in' }, 0)
         .to('.explorer__grid', { opacity: 0, duration: .5 }, .2)
-        .to('.explorer__bg', { filter: 'brightness(1) saturate(1)', duration: .7 }, .3)
+        .to('.explorer__dim', { opacity: 0, duration: .7 }, .3)
         .to(this.root, { opacity: 0, duration: .3 }, .75);
     },
 
@@ -191,6 +197,7 @@
       if (this.busy) return this.whenFree(() => this.openUnit(u));
       this.busy = true;
       this.unit = u;
+      emit('unit_opened', { code: code(this.level, u), plan: u.plan, name: u.name, level: this.level, status: unitStatus(this.level, u) });
       this.tip.classList.remove('is-on');
       const info = levelInfo(this.level);
       const plan = PLANS[u.plan];
@@ -293,6 +300,7 @@
       if (this.busy) return this.whenFree(() => this.openRoom(i));
       this.busy = true;
       this.fillRoom(i);
+      emit('room_opened', { code: code(this.level, this.unit), room: this.rooms[i] && this.rooms[i].type });
       const plan = PLANS[this.unit.plan].d2;
       gsap.set('#roomView', { visibility: 'visible', opacity: 0 });
       gsap.set('.roomv__text > *, .roomv__back, .roomv__nav, .roomv__tip', { opacity: 0 });
@@ -378,6 +386,7 @@
       if (this.busy) return this.whenFree(() => this.toggle3d());
       if (this.room != null) { this.closeRoom(); return this.whenFree(() => this.toggle3d()); }
       this.is3d = !this.is3d;
+      emit('toggle_3d', { code: code(this.level, this.unit), on: this.is3d });
       gsap.to('#unitRooms', { opacity: 0, duration: .3, onComplete: () => { this.placeRooms(); gsap.to('#unitRooms', { opacity: 1, duration: .5, delay: .6 }); } });
       $('#view3d').firstChild.textContent = this.is3d ? 'View in 2D ' : 'View in 3D ';
       const show = this.is3d ? '#plan3d' : '#plan2d', hide = this.is3d ? '#plan2d' : '#plan3d';
@@ -385,6 +394,20 @@
         .to(hide, { opacity: 0, rotateX: this.is3d ? 22 : -18, scale: .94, duration: .7, ease: 'power3.in' }, 0)
         .to(show, { opacity: 1, rotateX: 0, scale: 1, duration: 1, ease: 'expo.out' }, .35)
         .to('.unit__card .reveal--2d', { opacity: this.is3d ? 0 : 1, duration: .4 }, 0);
+    },
+
+    // jump straight to one residence from outside the explorer (the assistant's "View in 3D")
+    goto(n, unitId) {
+      const u = (n >= PENTHOUSE_FROM ? PLATES.penthouse : PLATES.typical).units.find((x) => x.id === unitId);
+      if (!u || n < 1 || n > LEVELS) return false;
+      const show = () => this.whenFree(() => {
+        if (this.unit && this.unit.id === u.id && this.level === n) return;
+        if (this.unit) this.backToFloor(true);
+        this.whenFree(() => this.openUnit(u));
+      });
+      if (getComputedStyle(this.root).visibility === 'hidden') { this.open(n); this.whenFree(show); }
+      else { if (n !== this.level) this.switchLevel(n); this.whenFree(show); }
+      return true;
     },
   };
 

@@ -2,57 +2,92 @@
    Aurelle Residence — scroll choreography
    GSAP + ScrollTrigger + Lenis
    ========================================================== */
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const $ = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
 const pad = (n) => String(n).padStart(2, '0');
 const isMobile = () => window.matchMedia('(max-width: 860px)').matches;
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const touch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 
-/* ---------------- smooth scroll ---------------- */
-const lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9 });
+/* ---------------- motion language ----------------
+   one set of eases and durations for the whole site, so every section
+   moves with the same rhythm */
+const EASE = { reveal: 'expo.out', move: 'power3.inOut', quick: 'power2.out', curtain: 'expo.inOut' };
+const DUR = { reveal: 1.4, move: 1.1, quick: .6 };
+const RISE = reduce ? 0 : 1; // reduced motion: reveals fade in place
+
+/* ---------------- smooth scroll ----------------
+   One smoother only. Lenis eases the wheel, so scrubbed timelines follow
+   it 1:1 (scrub: true) — a second scrub lag on top is what made the old
+   scroll feel rubbery. Touch scrolls natively; a short scrub there takes
+   the edge off without trailing behind the finger. */
+const SCRUB = touch ? .35 : true;
+ScrollTrigger.config({ ignoreMobileResize: true });
+if (touch) ScrollTrigger.defaults({ anticipatePin: 1 });
+const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1, stopInertiaOnNavigate: true });
 window.lenis = lenis;
 lenis.on('scroll', ScrollTrigger.update);
 gsap.ticker.add((t) => lenis.raf(t * 1000));
 gsap.ticker.lagSmoothing(0);
 lenis.stop();
 
+/* ---------------- chapter jumps ----------------
+   A jump of more than a screen and a half would scrub through the long
+   pinned films (hundreds of frames). Instead the green curtain wipes up,
+   the page moves behind it in one step, and the curtain lifts. */
+const curtain = $('#curtain');
+let jumping = false;
+function jumpTo(target, { covered = false } = {}) {
+  const el = target === 0 ? null : $(target);
+  const y = el ? el.getBoundingClientRect().top + window.scrollY : 0;
+  if (reduce || Math.abs(y - window.scrollY) < innerHeight * 1.5) {
+    lenis.scrollTo(target, { duration: 1.6, force: true });
+    return;
+  }
+  // the chapters menu already covers the screen: move behind it
+  if (covered) { lenis.scrollTo(target, { immediate: true, force: true }); ScrollTrigger.update(); return; }
+  if (jumping) return;
+  jumping = true;
+  gsap.timeline({ onComplete: () => { jumping = false; } })
+    .set(curtain, { visibility: 'visible' })
+    .fromTo(curtain, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: .7, ease: EASE.curtain })
+    .fromTo('.curtain__mark', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .5, ease: EASE.quick }, .3)
+    .add(() => { lenis.scrollTo(target, { immediate: true, force: true }); ScrollTrigger.update(); })
+    .to({}, { duration: .35 }) // a beat for the film at the new spot to decode
+    .to('.curtain__mark', { opacity: 0, y: -14, duration: .35, ease: 'power2.in' })
+    .to(curtain, { clipPath: 'inset(0% 0% 100% 0%)', duration: .8, ease: EASE.curtain }, '-=.15')
+    .set(curtain, { visibility: 'hidden' });
+}
+
 $$('[data-scrollto]').forEach((a) =>
   a.addEventListener('click', (e) => {
     e.preventDefault();
-    closeChapters();
     const target = a.dataset.scrollto === '#top' ? 0 : a.dataset.scrollto;
-    lenis.scrollTo(target, { duration: 2.2 });
+    const fromMenu = chapters.style.visibility === 'visible';
+    jumpTo(target, { covered: fromMenu });
+    if (fromMenu) setTimeout(closeChapters, 120);
   })
 );
 
-/* ---------------- word splitting ---------------- */
-function splitWords(root) {
-  const walk = (node) => {
-    [...node.childNodes].forEach((n) => {
-      if (n.nodeType === 3) {
-        const frag = document.createDocumentFragment();
-        n.textContent.split(/(\s+)/).forEach((part) => {
-          if (!part) return;
-          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
-          const w = document.createElement('span');
-          w.className = 'w';
-          const inner = document.createElement('span');
-          inner.textContent = part;
-          w.appendChild(inner);
-          frag.appendChild(w);
-        });
-        n.replaceWith(frag);
-      } else if (n.nodeType === 1 && n.tagName !== 'BR') walk(n);
-    });
-  };
-  walk(root);
-  return $$('.w > span', root);
+/* ---------------- split headings ----------------
+   words rise through a line mask (SplitText). No per-word blur: animating
+   filter on dozens of words repaints every frame. autoSplit re-splits when
+   the web fonts arrive or the width changes, and rebuilds the animation. */
+function riseWords(el, scrollTrigger, opts = {}) {
+  return SplitText.create(el, {
+    type: 'lines,words', mask: 'lines', linesClass: 'ln', autoSplit: true,
+    onSplit: (self) => gsap.from(self.words, {
+      yPercent: 105 * RISE, opacity: 0, duration: DUR.reveal, ease: EASE.reveal, stagger: .06, scrollTrigger, ...opts,
+    }),
+  });
 }
 
 /* ==========================================================
-   PRE-DECODE — decode each section's images ~2 screens before it
-   arrives, so first paint never stalls the scroll on a JPEG/WebP decode
+   IMAGES — decode each section's images ~2 screens before it arrives,
+   so first paint never stalls the scroll on a WebP decode, and let every
+   image fade in once decoded instead of popping in half-drawn
    ========================================================== */
 const decoded = new Set();
 function decodeUrl(url) {
@@ -63,12 +98,21 @@ function decodeUrl(url) {
   return img.decode().catch(() => {});
 }
 function decodeWithin(root) {
-  const urls = [...root.querySelectorAll('img')].map((i) => i.currentSrc || i.src);
+  // decode the <img> itself, so it is the srcset candidate the browser picked
+  const jobs = [...root.querySelectorAll('img')].map((i) => { i.loading = 'eager'; return i.decode().catch(() => {}); });
   [root, ...root.querySelectorAll('[style*="background-image"]')].forEach((el) => {
     const m = /url\(["']?([^"')]+)/.exec(el.style.backgroundImage || '');
-    if (m) urls.push(m[1]);
+    if (m) jobs.push(decodeUrl(m[1]));
   });
-  return Promise.all(urls.map(decodeUrl));
+  return Promise.all(jobs);
+}
+function fadeInImages(root = document) {
+  $$('main img:not(.is-in)', root).forEach((img) => {
+    const show = () => img.classList.add('is-in');
+    if (img.complete && img.naturalWidth) return show();
+    img.addEventListener('load', () => img.decode().catch(() => {}).then(show), { once: true });
+    img.addEventListener('error', show, { once: true });
+  });
 }
 const decodeIO = new IntersectionObserver((entries) => entries.forEach((e) => {
   if (e.isIntersecting) { decodeWithin(e.target); decodeIO.unobserve(e.target); }
@@ -78,7 +122,10 @@ $$('main > section').forEach((s) => decodeIO.observe(s));
 /* ==========================================================
    LOADER
    ========================================================== */
-(function loader() {
+// The site opens once the opening film is warm (its coarse frames across
+// the whole film + the first frames sharp), so the first scroll never
+// stutters. The counter shows that real progress; 8 s is the most it waits.
+function loader(film) {
   $$('.loader .draw').forEach((p) => {
     const len = p.getTotalLength();
     gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
@@ -90,24 +137,43 @@ $$('main > section').forEach((s) => decodeIO.observe(s));
     .to('.loader .draw:not(.base):not(.bar)', { strokeDashoffset: 0, duration: 1.2, stagger: .18, ease: 'power2.inOut' }, '-=.4')
     .to('.loader .bar', { strokeDashoffset: 0, duration: .5, ease: 'power2.out' }, '-=.4')
     .from('.loader__title', { opacity: 0, y: 10, duration: .8 }, '-=.6')
+    .from('.loader__count', { opacity: 0, duration: .6 }, '<')
     .to({}, { duration: .4 });
+
+  // the counter eases toward the real figure, and never runs backwards
+  const shown = { v: 0 };
+  let target = 0;
+  const pct = $('#loaderPct'), bar = $('#loaderBar');
+  const tick = () => {
+    target = Math.max(target, Math.min(.99, film.s.loaded));
+    shown.v += (target - shown.v) * .12;
+    pct.textContent = pad(Math.floor(shown.v * 100));
+    bar.style.transform = `scaleX(${shown.v})`;
+  };
+  gsap.ticker.add(tick);
 
   let ready = false, played = false;
   const finish = () => {
     if (!ready || !played) return;
+    ready = false;
+    gsap.ticker.remove(tick);
     gsap.timeline()
-      .to('.loader__title, .loader__arch', { opacity: 0, duration: .5 })
-      .to('.loader', { clipPath: 'inset(0 0 100% 0)', duration: 1.1, ease: 'expo.inOut' }, '-=.1')
-      .fromTo('.arrival__title span', { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, stagger: .12, duration: 1.4, ease: 'expo.out' }, '-=.5')
-      .fromTo('.arrival__tag, .arrival__dev', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 1 }, '-=1')
+      .to(shown, { v: 1, duration: .5, ease: EASE.quick, onUpdate: () => { pct.textContent = pad(Math.min(99, Math.floor(shown.v * 100))); bar.style.transform = `scaleX(${shown.v})`; } })
+      .add(() => { pct.textContent = '100'; })
+      .to('.loader__title, .loader__arch, .loader__count', { opacity: 0, duration: .5 }, '+=.15')
+      .to('.loader', { clipPath: 'inset(0 0 100% 0)', duration: 1.1, ease: EASE.curtain }, '-=.1')
+      .fromTo('.arrival__title span', { yPercent: 100 * RISE, opacity: 0 }, { yPercent: 0, opacity: 1, stagger: .12, duration: DUR.reveal, ease: EASE.reveal }, '-=.5')
+      .fromTo('.arrival__tag, .arrival__dev', { opacity: 0, y: 12 * RISE }, { opacity: 1, y: 0, duration: 1 }, '-=1')
       .add(() => { document.body.classList.remove('is-loading'); gsap.set('.loader', { display: 'none' }); lenis.start(); ScrollTrigger.refresh(); });
   };
   tl.eventCallback('onComplete', () => { played = true; finish(); });
   tl.play();
   const done = () => { ready = true; finish(); };
-  window.addEventListener('load', done);
-  setTimeout(done, 5000);
-})();
+  Promise.race([
+    Promise.all([film.s.warm, document.fonts ? document.fonts.ready : null]),
+    new Promise((r) => setTimeout(r, 8000)),
+  ]).then(done);
+}
 
 /* ==========================================================
    CHAPTERS MENU
@@ -129,13 +195,23 @@ $('#chaptersClose').addEventListener('click', closeChapters);
 
 /* AI-film frame sequences (see js/sequence.js). If a sequence's frames
    are missing the canvas stays hidden and the image layers play instead. */
-function makeSeq(sel, name, onReady, trigger) {
+function makeSeq(sel, name, onReady, section, { lazy = false } = {}) {
   const o = { c: $(sel), ok: false };
   o.s = new FrameSequence(o.c, name);
   o.s.ready.then(() => { o.ok = true; onReady && onReady(o); }).catch(() => {});
-  // start loading frames once the section is within ~3 screens
-  if (trigger) ScrollTrigger.create({ trigger, start: 'top 400%', once: true, onEnter: () => o.s.start() });
-  else if (trigger !== false) o.s.start();
+  // a film is awake (keeps sharp frames, downloads around its playhead) from
+  // two screens before its section until a screen after it; asleep it keeps
+  // only its coarse frames, so the two films never hold memory at once
+  const st = ScrollTrigger.create({
+    trigger: section, start: 'top 300%', end: 'bottom -100%',
+    onToggle: (self) => (self.isActive ? o.s.wake() : o.s.sleep()),
+  });
+  if (!st.isActive) o.s.sleep();
+  // the films carry their own texture: no grain layer over the canvas while one is on screen
+  ScrollTrigger.create({ trigger: section, start: 'top bottom', end: 'bottom top', toggleClass: { targets: document.body, className: 'on-film' } });
+  // a lazy film starts loading once its section is within ~3 screens
+  if (lazy) ScrollTrigger.create({ trigger: section, start: 'top 400%', once: true, onEnter: () => o.s.start() });
+  else o.s.start();
   return o;
 }
 
@@ -144,11 +220,11 @@ function makeSeq(sel, name, onReady, trigger) {
    them, over the community, and round to the tower at dusk. The film
    ends on the exact frame the residences section opens with.
    ========================================================== */
-(function arrival() {
+const hero = (function arrival() {
   const T = 10; // timeline length; the film runs across all of it
   const tl = gsap.timeline({
     defaults: { ease: 'none' },
-    scrollTrigger: { trigger: '.arrival', start: 'top top', end: '+=900%', scrub: .6, pin: '.arrival__stage' },
+    scrollTrigger: { trigger: '.arrival', start: 'top top', end: '+=900%', scrub: SCRUB, pin: '.arrival__stage' },
   });
   tl.to('.arrival__hero', { y: -80, opacity: 0, duration: .8 }, 0)
     .to('.arrival__dev', { opacity: 0, duration: .5 }, 0)
@@ -168,10 +244,12 @@ function makeSeq(sel, name, onReady, trigger) {
     .to('.why-shade', { opacity: 0, duration: .6 }, 8.1)
     .to({}, { duration: T - 8.7 }, 8.7);
 
-  const sync = () => { if (hero.ok) hero.s.progress = tl.time() / T; };
-  const hero = makeSeq('#seqHero', 'hero', (o) => { o.c.classList.add('is-live'); sync(); });
+  const sync = () => { if (film.ok) film.s.progress = tl.time() / T; };
+  const film = makeSeq('#seqHero', 'hero', (o) => { o.c.classList.add('is-live'); sync(); }, '.arrival');
   tl.eventCallback('onUpdate', sync);
+  return film;
 })();
+loader(hero);
 
 /* ==========================================================
    02 EXPLORE RESIDENCES
@@ -228,7 +306,7 @@ function makeSeq(sel, name, onReady, trigger) {
   const tl = gsap.timeline({
     defaults: { ease: 'none' },
     scrollTrigger: {
-      trigger: '.lobby', start: 'top top', end: '+=1800%', scrub: .6, pin: '.lobby__stage',
+      trigger: '.lobby', start: 'top top', end: '+=1800%', scrub: SCRUB, pin: '.lobby__stage',
       onUpdate: (st) => gsap.set('#tourBar', { scaleX: st.progress }),
     },
   });
@@ -241,16 +319,21 @@ function makeSeq(sel, name, onReady, trigger) {
   });
   tl.to({}, { duration: 0 }, T);
   const sync = () => { if (seq.ok) seq.s.progress = tl.time() / T; };
-  const seq = makeSeq('#seqTour', 'tour', (o) => { o.c.classList.add('is-live'); sync(); }, '.lobby');
+  const seq = makeSeq('#seqTour', 'tour', (o) => { o.c.classList.add('is-live'); sync(); }, '.lobby', { lazy: true });
   tl.eventCallback('onUpdate', sync);
+  // once the opening film is warm, quietly fetch the tour's coarse frames
+  // too, so a fast scroll (or a chapter jump) into the lobby lands on a picture
+  hero.s.warm.then(() => setTimeout(() => seq.s.start(), 1500));
 })();
+
+const FULL = 'inset(0px 0px 0px 0px round 0px 0px 0px 0px)';
 
 /* ==========================================================
    04 STEP INSIDE — arches rise one by one
    ========================================================== */
 (function inside() {
   const cards = $$('.arch-card');
-  gsap.timeline({ scrollTrigger: { trigger: '.arches', start: 'top 90%', end: 'center 55%', scrub: .6 } })
+  gsap.timeline({ scrollTrigger: { trigger: '.arches', start: 'top 90%', end: 'center 55%', scrub: SCRUB } })
     .from('.arch-card .arch', { clipPath: 'inset(100% 0% 0% 0%)', stagger: .35, duration: 1, ease: 'power2.out' })
     .from('.arch-card .arch img', { scale: 1.35, stagger: .35, duration: 1 }, 0)
     .from('.arch-card > :not(.arch)', { opacity: 0, y: 14, stagger: .05, duration: .5 }, .9);
@@ -271,13 +354,13 @@ function makeSeq(sel, name, onReady, trigger) {
     const t = r.top, l = r.left, rt = innerWidth - r.right, b = innerHeight - r.bottom, rad = r.width / 2;
     return `inset(${t}px ${rt}px ${b}px ${l}px round ${rad}px ${rad}px 0px 0px)`;
   };
-  const FULL = 'inset(0px 0px 0px 0px round 0px 0px 0px 0px)';
 
   cards.forEach((c) =>
     c.addEventListener('click', () => {
       const d = ROOMS[c.dataset.room];
       lastArch = c.querySelector('.arch');
-      $('#roomImg').src = c.querySelector('img').src;
+      const im = c.querySelector('img');
+      $('#roomImg').src = im.currentSrc || im.src;
       $('#roomNum').textContent = d.n;
       $('#roomTitle').innerHTML = d.t;
       $('#roomSub').textContent = d.s;
@@ -345,20 +428,23 @@ function makeSeq(sel, name, onReady, trigger) {
     list.appendChild(li);
   });
   const lis = $$('#amenList li');
-  let active = -1, z = 1;
+  let active = -1, z = 1, lastAt = 0;
   function show(i, dir = 1) {
     if (i === active) return;
     const prev = slides[active];
     active = i;
+    // stepping quickly through the list: shorter curtains, so the image keeps up with the list
+    const now = performance.now(), d = now - lastAt < 450 ? .55 : DUR.move;
+    lastAt = now;
     lis.forEach((li, k) => li.classList.toggle('is-on', k === i));
     const s = slides[i], img = s.firstChild;
     gsap.killTweensOf([s, img]);
     gsap.set(s, { zIndex: ++z, visibility: 'visible' });
-    gsap.fromTo(s, { yPercent: 100 * dir }, { yPercent: 0, duration: 1.1, ease: 'expo.inOut' });
-    gsap.fromTo(img, { yPercent: -70 * dir, scale: 1.15 }, { yPercent: 0, scale: 1, duration: 1.1, ease: 'expo.inOut' });
+    gsap.fromTo(s, { yPercent: 100 * dir }, { yPercent: 0, duration: d, ease: 'expo.inOut' });
+    gsap.fromTo(img, { yPercent: -70 * dir, scale: 1.15 }, { yPercent: 0, scale: 1, duration: d, ease: 'expo.inOut' });
     if (prev) {
       gsap.killTweensOf(prev.firstChild);
-      gsap.to(prev.firstChild, { yPercent: -18 * dir, duration: 1.1, ease: 'expo.inOut' });
+      gsap.to(prev.firstChild, { yPercent: -18 * dir, duration: d, ease: 'expo.inOut' });
     }
     // counter + caption
     const num = $('#amenNum');
@@ -382,7 +468,7 @@ function makeSeq(sel, name, onReady, trigger) {
   });
 
   // intro: stage opens from a line, list rows arrive
-  gsap.timeline({ scrollTrigger: { trigger: '.amenities', start: 'top 75%', end: 'top top', scrub: .6 } })
+  gsap.timeline({ scrollTrigger: { trigger: '.amenities', start: 'top 75%', end: 'top top', scrub: SCRUB } })
     .fromTo('#amenStage', { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', ease: 'power2.out' })
     .from(lis, { opacity: 0, y: 24, stagger: .04, ease: 'power2.out' }, .2);
 })();
@@ -396,7 +482,7 @@ function makeSeq(sel, name, onReady, trigger) {
   const h = gsap.to(track, {
     x: () => -dist(), ease: 'none',
     scrollTrigger: {
-      trigger: '.wellness', start: 'top top', end: () => '+=' + dist(), pin: '.wellness__pin', scrub: .6,
+      trigger: '.wellness', start: 'top top', end: () => '+=' + dist(), pin: '.wellness__pin', scrub: SCRUB,
       invalidateOnRefresh: true,
       onUpdate: (s) => gsap.set('#wBar', { scaleX: s.progress }),
     },
@@ -423,11 +509,11 @@ function makeSeq(sel, name, onReady, trigger) {
    ========================================================== */
 gsap.timeline({
   defaults: { ease: 'none' },
-  scrollTrigger: { trigger: '.water', start: 'top top', end: '+=260%', scrub: .6, pin: '.water__pin' },
+  scrollTrigger: { trigger: '.water', start: 'top top', end: '+=260%', scrub: SCRUB, pin: '.water__pin' },
 })
   .fromTo('.water__img', { scale: 1.2 }, { scale: 1, duration: 1.6 }, 0)
-  .from('.water__h .l1', { opacity: 0, y: 40, filter: 'blur(10px)', duration: .5 }, .1)
-  .from('.water__h .l2', { opacity: 0, y: 40, filter: 'blur(10px)', duration: .5 }, .35)
+  .from('.water__h .l1', { opacity: 0, y: 50 * RISE, duration: .5, ease: EASE.quick }, .1)
+  .from('.water__h .l2', { opacity: 0, y: 50 * RISE, duration: .5, ease: EASE.quick }, .35)
   .to('.water__disc', { scale: 1, duration: 1.2, ease: 'power2.in' }, 1.3)
   .fromTo('.water__reveal .eyebrow, .water__reveal .display', { opacity: 0, y: 80 }, { opacity: 1, y: 0, duration: .8 }, 2.2)
   .fromTo('.water__thumb, .mono', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: .5 }, 2.5)
@@ -441,10 +527,10 @@ gsap.timeline({
    ========================================================== */
 gsap.timeline({
   defaults: { ease: 'none' },
-  scrollTrigger: { trigger: '.above', start: 'top top', end: '+=220%', scrub: .6, pin: '.above__pin' },
+  scrollTrigger: { trigger: '.above', start: 'top top', end: '+=220%', scrub: SCRUB, pin: '.above__pin' },
 })
   .fromTo('.above__frame img', { scale: 1.15 }, { scale: 1, duration: 1.4 }, 0)
-  .from('.above__h', { opacity: 0, yPercent: 30, filter: 'blur(14px)', duration: .6 }, .1)
+  .from('.above__h', { opacity: 0, yPercent: 30 * RISE, scale: .97, duration: .6, ease: EASE.quick }, .1)
   .to('.above__copy, .above__tag', { opacity: 1, duration: .4 }, .7)
   .to('.above__h', { y: -40, duration: .6 }, 1)
   .to({}, { duration: .3 });
@@ -463,12 +549,11 @@ gsap.from('.gen__lead, .gen__tags li', { opacity: 0, y: 24, stagger: .08, durati
 
 // HOME: side frames part, the centre frame opens to full screen, the line lands
 (function home() {
-  const words = splitWords($('.home__h'));
-  gsap.from(words, { yPercent: 60, opacity: 0, filter: 'blur(14px)', stagger: .07, duration: 1.6, ease: 'expo.out', scrollTrigger: { trigger: '.home', start: 'top 60%' } });
+  riseWords($('.home__h'), { trigger: '.home', start: 'top 60%' });
   gsap.from('.hf--side, .hf--main', { opacity: 0, y: 60, stagger: .1, duration: 1.4, ease: 'expo.out', scrollTrigger: { trigger: '.home', start: 'top 50%' } });
   gsap.timeline({
     defaults: { ease: 'none' },
-    scrollTrigger: { trigger: '.home', start: 'top top', end: '+=220%', scrub: .6, pin: '.home__pin' },
+    scrollTrigger: { trigger: '.home', start: 'top top', end: '+=220%', scrub: SCRUB, pin: '.home__pin' },
   })
     .to('.hf--l', { xPercent: -60, opacity: 0, duration: 1 }, .2)
     .to('.hf--r', { xPercent: 60, opacity: 0, duration: 1 }, .2)
@@ -489,8 +574,8 @@ $$('.life__specs li').forEach((li) =>
    ========================================================== */
 parallax('.reach__bg', 200, '.reach');
 gsap.from('.reach__h span, .reach__h em', {
-  opacity: 0, filter: 'blur(18px)', yPercent: 30, stagger: .25, ease: 'none',
-  scrollTrigger: { trigger: '.reach__h', start: 'top 90%', end: 'top 40%', scrub: .6 },
+  opacity: 0, yPercent: 30 * RISE, scale: .96, stagger: .25, ease: 'none',
+  scrollTrigger: { trigger: '.reach__h', start: 'top 90%', end: 'top 40%', scrub: SCRUB },
 });
 $$('.reach__stats b').forEach((b) => {
   const o = { v: 0 };
@@ -505,11 +590,18 @@ gsap.from('.reach__stats li', { opacity: 0, y: 30, stagger: .12, duration: 1, sc
 /* ==========================================================
    13 PODIUM — strip opens into the plan
    ========================================================== */
+// the plan box sits at its final size; this clips it down to the thin
+// line it starts as (70vw wide, 2px high, 66% down the screen)
+const podiumLine = () => {
+  const w = innerWidth, h = innerHeight, box = w * (isMobile() ? .92 : .84), line = isMobile() ? box : w * .7;
+  const side = (box - line) / 2;
+  return `inset(${h * .41 - 1}px ${side}px ${h * .25 - 1}px ${side}px)`;
+};
 gsap.timeline({
   defaults: { ease: 'none' },
-  scrollTrigger: { trigger: '.podium', start: 'top top', end: '+=200%', scrub: .6, pin: '.podium__pin' },
+  scrollTrigger: { trigger: '.podium', start: 'top top', end: '+=200%', scrub: SCRUB, pin: '.podium__pin', invalidateOnRefresh: true },
 })
-  .to('.podium__map', { height: '66vh', width: () => (isMobile() ? '92vw' : '84vw'), top: '58%', duration: 1, ease: 'power2.inOut' })
+  .fromTo('.podium__map', { clipPath: podiumLine }, { clipPath: 'inset(0px 0px 0px 0px)', duration: 1, ease: 'power2.inOut' })
   .fromTo('.podium__map img', { scale: 1.6 }, { scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
   .to('.podium .sec-head', { y: -60, opacity: .2, duration: 1 }, 0)
   .to('.pin', { opacity: 1, stagger: .08, duration: .2 }, .9)
@@ -518,16 +610,21 @@ gsap.timeline({
 /* ==========================================================
    14 FINALE — wordmark, arch window, full reveal
    ========================================================== */
+// the arch window: 16vw wide (44vw on phones), 20vh from the top, 50vh tall
+const finaleArch = () => {
+  const w = innerWidth, h = innerHeight, aw = w * (isMobile() ? .44 : .16), l = (w - aw) / 2;
+  return `inset(${h * .2}px ${l}px ${h * .3}px ${l}px round ${aw / 2}px ${aw / 2}px 0px 0px)`;
+};
 gsap.timeline({
   defaults: { ease: 'none' },
-  scrollTrigger: { trigger: '.finale', start: 'top top', end: '+=300%', scrub: .6, pin: '.finale__pin' },
+  scrollTrigger: { trigger: '.finale', start: 'top top', end: '+=300%', scrub: SCRUB, pin: '.finale__pin', invalidateOnRefresh: true },
 })
   .from('.finale__word', { yPercent: 40, opacity: 0, duration: .6 })
   .from('.finale__arch', { y: '40vh', duration: .7 }, .1)
   .from('.finale__cta', { opacity: 0, y: 30, duration: .4 }, .5)
   .to({}, { duration: .4 })
   .to('.finale__cta, .finale__eyebrow', { opacity: 0, duration: .3 }, 1.3)
-  .to('.finale__arch', { width: '100vw', height: '100vh', top: 0, borderRadius: 0, duration: 1.1, ease: 'power2.inOut' }, 1.4)
+  .fromTo('.finale__arch', { clipPath: finaleArch }, { clipPath: FULL, duration: 1.1, ease: 'power2.inOut' }, 1.4)
   .to('.finale__word', { scale: 1.3, opacity: 0, duration: .8 }, 1.5)
   .to('.finale__end', { opacity: 1, duration: .4 }, 2.4)
   .from('.finale__end .display', { y: 30, duration: .4 }, 2.4)
@@ -648,18 +745,40 @@ gsap.fromTo('.contact__word', { yPercent: 30 }, { yPercent: 0, ease: 'none', scr
   });
 })();
 
+/* ==========================================================
+   HAND-OFFS — where a pinned scene gives way to a section of another
+   colour, the scene drifts up slower than the page and dissolves into the
+   next section's colour, so there is no hard seam. Transform + opacity only.
+   ========================================================== */
+function handoff(stage, next) {
+  const el = $(stage), nx = $(next);
+  if (!el || !nx) return;
+  // move the scene's children into one layer that can drift as a whole
+  const layer = document.createElement('div');
+  layer.className = 'handoff';
+  while (el.firstChild) layer.appendChild(el.firstChild);
+  el.appendChild(layer);
+  const veil = document.createElement('i');
+  veil.className = 'handoff__veil';
+  veil.style.background = getComputedStyle(nx).backgroundColor;
+  el.appendChild(veil);
+  gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: nx, start: 'top bottom', end: 'top top', scrub: SCRUB } })
+    .fromTo(layer, { yPercent: 0 }, { yPercent: 32 * RISE }, 0)
+    .fromTo(veil, { opacity: 0 }, { opacity: .9, ease: 'power1.in' }, 0);
+}
+handoff('.lobby__stage', '.inside');
+handoff('.above__pin', '.gen');
+handoff('.home__pin', '.life');
+handoff('.podium__pin', '.finale');
+handoff('.finale__pin', '.contact');
+
+fadeInImages();
+
 /* created last so their positions include every pinned section above them */
 /* ==========================================================
    GENERIC — split headings reveal
    ========================================================== */
-$$('.split').forEach((h) => {
-  const words = splitWords(h);
-  // the reference's signature: words resolve out of a soft blur while rising
-  gsap.from(words, {
-    yPercent: 60, opacity: 0, filter: 'blur(14px)', duration: 1.6, ease: 'expo.out', stagger: .07,
-    scrollTrigger: { trigger: h, start: 'top 85%' },
-  });
-});
+$$('.split').forEach((h) => riseWords(h, { trigger: h, start: 'top 85%' }));
 
 /* ==========================================================
    HEADER / RAIL THEME + PROGRESS

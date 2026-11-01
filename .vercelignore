@@ -16,3 +16,10 @@ tools
 !assets/video/*.mp4
 PLAN.md
 README.md
+db
+data
+scripts
+tests
+.env*
+reports
+research_notes

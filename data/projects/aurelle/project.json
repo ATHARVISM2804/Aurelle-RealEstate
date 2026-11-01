@@ -1,0 +1,43 @@
+{
+  "org": { "name": "Halden Properties", "slug": "halden" },
+  "slug": "aurelle",
+  "name": "Aurelle Residence",
+  "timezone": "Asia/Dubai",
+  "currency": "AED",
+  "settings": {
+    "brand": { "assistant_name": "Aurelle", "developer": "Halden Properties" },
+    "contact": {
+      "whatsapp": "971500000000",
+      "phone": "+971 4 000 0000",
+      "email": "hello@haldenproperties.example",
+      "sales_emails": []
+    },
+    "location": {
+      "address": "Sales gallery, Al Furjan, Dubai",
+      "lat": 25.0263,
+      "lng": 55.1449,
+      "maps_url": "https://maps.google.com/?q=Al+Furjan+Dubai",
+      "map_img": "assets/img/tower-dusk.webp"
+    },
+    "pricing": {
+      "published": false,
+      "note": "js/config.js holds sample figures. Set published=true only once the live price sheet is loaded into units.",
+      "from": { "oneBhk": 1250000, "oneBhkStudy": 1480000, "twoBhk": 2350000, "threeBhk": 6900000, "fourBhk": 8900000 },
+      "perLevel": 0.012
+    },
+    "booking": {
+      "lead_time_minutes": 120,
+      "horizon_days": 14,
+      "kinds": ["site_visit", "video_call"]
+    },
+    "pipeline": { "rot_days": { "new": 1, "contacted": 3, "qualified": 5, "visit_booked": 7, "visited": 5, "negotiation": 10 } },
+    "scoring": {},
+    "levels": 16,
+    "penthouse_from": 15,
+    "unit_code_pattern": "\\b(?:0[1-9]|1[0-6])-(?:[A-E]|P[1-3])\\b"
+  },
+  "availability": [
+    { "kind": "site_visit", "weekdays": [0, 1, 2, 3, 4, 5, 6], "start": "10:00", "end": "19:00", "slot_minutes": 45, "capacity": 2, "location": "Sales gallery, Al Furjan" },
+    { "kind": "video_call", "weekdays": [0, 1, 2, 3, 4, 5, 6], "start": "10:00", "end": "18:00", "slot_minutes": 30, "capacity": 1, "location": "Video call" }
+  ]
+}
