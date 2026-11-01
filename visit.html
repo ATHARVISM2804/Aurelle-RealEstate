@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Your visit — Aurelle Residence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/assistant.css">
+<style>
+  :root { --cream: #f2eee7; --paper: #f7f4ef; --ink: #1b1a17; --grey: #8f8a80; --line: rgba(27,26,23,.14); --green: #1e2722; --white: #f4f1ea;
+    --serif: "Instrument Serif", "Times New Roman", serif; --sans: "Inter", system-ui, sans-serif; --ease: cubic-bezier(.65,0,.35,1); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; background: var(--cream); color: var(--ink); font: 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; display: grid; place-items: start center; padding: clamp(28px, 7vh, 80px) 16px 60px; }
+  .v { width: min(520px, 100%); }
+  .v__brand { display: flex; align-items: center; gap: 12px; margin-bottom: 34px; text-decoration: none; color: var(--ink); }
+  .v__brand svg { width: 26px; height: 32px; fill: none; stroke: var(--ink); stroke-width: 3; }
+  .v__brand b { font-family: var(--serif); font-weight: 400; font-size: 26px; line-height: 1; }
+  .v__brand small { display: block; font-size: 9px; letter-spacing: .3em; text-transform: uppercase; color: var(--grey); margin-top: 3px; }
+  .v__eyebrow { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--grey); }
+  .v__h { font-family: var(--serif); font-weight: 400; font-size: clamp(36px, 7vw, 52px); line-height: 1.02; margin: 10px 0 22px; }
+  .v__h em { font-style: italic; }
+  .v .axc { margin-bottom: 14px; }
+  .v__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .v__link { background: none; border: 0; color: #6c675e; font: 12.5px var(--sans); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; margin-top: 22px; }
+  .v__msg { font-size: 13px; color: #6c675e; margin: 12px 0; }
+  .v__msg--err { color: #b23a2e; }
+  .v__foot { margin-top: 40px; font-size: 12px; color: var(--grey); line-height: 1.6; }
+  .v__foot a { color: inherit; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main class="v" id="visit">
+  <a class="v__brand" href="/">
+    <svg viewBox="-2 6 104 128" aria-hidden="true"><path d="M10 130V50a40 40 0 0 1 80 0v80"/><path d="M12 130 50 10l38 120M26 130l24-82 24 82M12 130h14m48 0h14M24 92h52"/></svg>
+    <span><b>Aurelle</b><small>Residence</small></span>
+  </a>
+  <p class="v__eyebrow" id="vEyebrow">Your visit</p>
+  <h1 class="v__h" id="vTitle">One moment…</h1>
+  <div id="vCard"></div>
+  <p class="v__msg" id="vMsg" role="status" aria-live="polite"></p>
+  <div id="vPicker"></div>
+  <div class="v__actions" id="vActions"></div>
+  <p class="v__foot" id="vFoot"></p>
+</main>
+<script type="module" src="js/visit.js"></script>
+</body>
+</html>

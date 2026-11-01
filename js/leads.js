@@ -118,10 +118,14 @@
 
   function payload() {
     const f = form.elements;
+    const track = window.AurelleTrack;
     return {
       type: mode, name: f.name.value.trim(), phone: `${f.cc.value} ${f.phone.value.trim()}`, email: f.email.value.trim(),
       unit: f.unit.value || f.interest.value, budget: f.budget.value, contact: (form.querySelector('[name=contact]:checked') || {}).value || '',
       message: f.message.value.trim(), page: location.href, ...utm, at: new Date().toISOString(),
+      // for the leads database: who this visitor is, where they came from, what they explored, what they agreed to
+      project: cfg.project, anon_id: track && track.anonId, attribution: track && track.attribution(), events: track ? track.drain() : [],
+      consent: f.consent.checked, consent_text: (f.consent.nextElementSibling || {}).textContent || '', consent_version: 'form-v1',
     };
   }
 
@@ -152,6 +156,7 @@
 
   function done(data) {
     const first = data.name.split(' ')[0];
+    document.dispatchEvent(new CustomEvent('aurelle:' + (mode === 'brochure' ? 'brochure_downloaded' : 'enquiry_submitted'), { detail: { kind: mode, unit: data.unit } }));
     $('#enqDoneTitle').textContent = mode === 'brochure' ? `Enjoy the read, ${first}.` : `Thank you, ${first}.`;
     $('#enqDoneText').textContent = mode === 'brochure'
       ? 'Your brochure is downloading. A consultant will follow up in case you have questions.'
@@ -170,5 +175,7 @@
   // the WhatsApp button appears once the visitor is past the opening film
   ScrollTrigger.create({ trigger: '#residences', start: 'top 60%', onEnter: () => document.body.classList.add('show-wa'), onLeaveBack: () => document.body.classList.remove('show-wa') });
 
-  window.Leads = { open, close };
+  $('#waBtn').addEventListener('click', () => document.dispatchEvent(new CustomEvent('aurelle:cta_whatsapp', { detail: { from: 'button' } })));
+
+  window.Leads = { open, close, wa };
 })();
