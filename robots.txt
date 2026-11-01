@@ -2,4 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /tools/
 Disallow: /api/
+Disallow: /dashboard
+Disallow: /visit
 Sitemap: https://SITE_URL/sitemap.xml

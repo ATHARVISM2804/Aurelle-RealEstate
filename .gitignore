@@ -22,3 +22,9 @@ assets/seq/hero/*.webp
 assets/seq/hero/manifest.json
 assets/seq/tour/*.webp
 assets/seq/tour/manifest.json
+
+# dependencies and local secrets
+node_modules/
+.env
+.env.local
+.env.*.local
