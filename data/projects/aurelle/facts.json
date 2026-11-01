@@ -1,0 +1,52 @@
+{
+  "project": "aurelle",
+  "facts": [
+    { "id": "dev.name", "topic": "developer", "text": "Aurelle Residence is developed by Halden Properties.", "status": "confirmed", "source": "brochure" },
+    { "id": "loc.area", "topic": "location", "text": "Located in Al Furjan, Dubai, a connected community between Dubai Marina and Al Maktoum International Airport, with parks, schools and everyday conveniences.", "status": "confirmed", "source": "brochure" },
+    { "id": "loc.metro", "topic": "location", "text": "About 5 minutes to Al Furjan Metro.", "numbers": [5], "status": "confirmed", "source": "brochure" },
+    { "id": "loc.marina", "topic": "location", "text": "About 5 minutes to Dubai Marina.", "numbers": [5], "status": "confirmed", "source": "brochure" },
+    { "id": "loc.ibn", "topic": "location", "text": "About 12 minutes to Ibn Battuta Mall.", "numbers": [12], "status": "confirmed", "source": "brochure" },
+    { "id": "loc.dwc", "topic": "location", "text": "About 25 minutes to Al Maktoum International Airport.", "numbers": [25], "status": "confirmed", "source": "brochure" },
+    { "id": "bld.levels", "topic": "building", "text": "Sixteen residential levels with 76 residences in total.", "numbers": [16, 76], "status": "confirmed", "source": "site" },
+    { "id": "bld.types", "topic": "residences", "text": "Five residence types: 1 BHK, 1 BHK + Study, 2 BHK + Maid Room on levels 1 to 14 and on the penthouse floors, and 3 BHK and 4 BHK penthouses with private jacuzzi on levels 15 and 16.", "numbers": [1, 2, 3, 4, 5, 14, 15, 16], "status": "confirmed", "source": "brochure" },
+    { "id": "bld.typical", "topic": "residences", "text": "Each typical floor (levels 1 to 14) has five homes: two corner 2 BHK + Maid Room units (A and E), two 1 BHK + Study units (B and D) and one central 1 BHK (C).", "numbers": [1, 14, 2], "status": "confirmed", "source": "site" },
+    { "id": "bld.penthouse", "topic": "residences", "text": "Penthouse floors (levels 15 and 16) have three homes: a 4 BHK penthouse with jacuzzi (P1), a 2 BHK + Maid Room (P2) and a 3 BHK penthouse with jacuzzi (P3).", "numbers": [15, 16, 4, 2, 3], "status": "confirmed", "source": "site" },
+    { "id": "spec.ceiling", "topic": "specs", "text": "Ceiling heights of 3.65 m.", "numbers": [3.65], "status": "confirmed", "source": "brochure" },
+    { "id": "spec.finishes", "topic": "specs", "text": "Italian finishes throughout, including Italian kitchen cabinetry with a stone island.", "status": "confirmed", "source": "brochure" },
+    { "id": "spec.smart", "topic": "specs", "text": "A single-panel smart home system controls the home.", "status": "confirmed", "source": "brochure" },
+    { "id": "spec.layout", "topic": "specs", "text": "Open layouts with floor-to-ceiling glass in the living areas; bathrooms in stone and oak with a freestanding tub.", "status": "confirmed", "source": "site" },
+    { "id": "am.podium", "topic": "amenities", "text": "Twelve amenities on the landscaped podium, a lift ride from every home: Zen Garden, Yoga Studio, gym, walking track, adults swimming pool, steam room and lockers, social terrace, jacuzzi, adults outdoor gym, kids play area, padel court and a cricket simulator.", "numbers": [12], "status": "confirmed", "source": "brochure" },
+    { "id": "gal.hours", "topic": "sales_gallery", "text": "The sales gallery is in Al Furjan and is open daily from 10:00 to 19:00. Private site visits and video calls can be booked here in the chat.", "numbers": [10, 19], "status": "confirmed", "source": "site" },
+    { "id": "media.ai", "topic": "media", "text": "Images and films on the website are AI-generated artist impressions for illustration only; plans, areas and availability are indicative and subject to change.", "status": "confirmed", "source": "brochure" },
+    { "id": "areas.units", "topic": "residences", "text": "Unit sizes range from about 673 sq ft (1 BHK) to about 3,356 sq ft (4 BHK penthouse) including balcony; exact areas per unit come from the unit lookup.", "numbers": [673, 3356], "status": "confirmed", "source": "site" }
+  ],
+  "pending": [
+    { "id": "pay.plan", "topic": "payment_plan", "keywords": ["payment plan", "installment", "instalment", "down payment", "booking amount", "post-handover", "post handover"], "policy": "Do not describe or guess a payment plan. Say a consultant will share the current payment plan, and offer the price sheet or a callback." },
+    { "id": "hand.date", "topic": "handover", "keywords": ["handover", "hand over", "completion", "possession", "ready date", "when ready", "delivery date", "keys", "move in", "move-in", "ready to move", "construction"], "policy": "Do not state or estimate a handover or completion date. Offer to connect a consultant." },
+    { "id": "legal.permit", "topic": "permit", "keywords": ["rera", "dld", "permit", "escrow", "trakheesi", "registration number", "oqood"], "policy": "Regulatory registration, permit and escrow details are provided by the sales team. Offer a consultant." },
+    { "id": "svc.charge", "topic": "service_charges", "keywords": ["service charge", "maintenance fee", "community fee"], "policy": "Do not quote service charges. Offer a consultant." },
+    { "id": "parking", "topic": "parking", "keywords": ["parking", "car park"], "policy": "Parking allocation is confirmed by the sales team. Offer a consultant." },
+    { "id": "mortgage", "topic": "finance", "keywords": ["mortgage", "loan", "bank finance", "emi"], "policy": "Do not give mortgage or loan advice. Offer a consultant who can introduce mortgage partners." }
+  ],
+  "amenities": [
+    { "id": "am.zen", "name": "Zen Garden", "desc": "A quiet green pause between home and the city.", "img": "assets/img/garden-vertical.webp", "cat": "Wellness" },
+    { "id": "am.yoga", "name": "Yoga Studio", "desc": "Soft light, sprung floors, room to breathe.", "img": "assets/img/yoga.webp", "cat": "Wellness" },
+    { "id": "am.gym", "name": "Modern Well-Equipped Gym", "desc": "Strength, cardio and functional training.", "img": "assets/img/gym-equipment.webp", "cat": "Fitness" },
+    { "id": "am.track", "name": "Walking Track", "desc": "A loop for the beginning and end of every day.", "img": "assets/img/track.webp", "cat": "Fitness" },
+    { "id": "am.pool", "name": "Adults Swimming Pool", "desc": "Long, calm lengths above the community.", "img": "assets/img/pool-deck.webp", "cat": "Leisure" },
+    { "id": "am.steam", "name": "Steam Room & Lockers", "desc": "Heat, stillness and somewhere to leave it all.", "img": "assets/img/sauna.webp", "cat": "Wellness" },
+    { "id": "am.terrace", "name": "Open Terrace for Socials", "desc": "Long tables for friends and late sunsets.", "img": "assets/img/terrace-social.webp", "cat": "Social" },
+    { "id": "am.jacuzzi", "name": "Jacuzzi", "desc": "Warm water, open sky.", "img": "assets/img/jacuzzi.webp", "cat": "Leisure" },
+    { "id": "am.outdoor", "name": "Adults Outdoor Gym", "desc": "Open-air exercise in the shade of the planting.", "img": "assets/img/outdoor-gym.webp", "cat": "Fitness" },
+    { "id": "am.kids", "name": "Kids Play Area", "desc": "Room for their adventures.", "img": "assets/img/kids-play.webp", "cat": "Family" },
+    { "id": "am.padel", "name": "Padel Court", "desc": "The game everyone is playing, downstairs.", "img": "assets/img/padel.webp", "cat": "Sport" },
+    { "id": "am.cricket", "name": "Cricket Simulator", "desc": "Net practice, any time of year.", "img": "assets/img/cricket.webp", "cat": "Sport" }
+  ],
+  "travel": [
+    { "label": "Al Furjan Metro", "minutes": 5 },
+    { "label": "Dubai Marina", "minutes": 5 },
+    { "label": "Ibn Battuta Mall", "minutes": 12 },
+    { "label": "Al Maktoum Int'l Airport", "minutes": 25 }
+  ],
+  "forbidden_claims": ["roi", "return on investment", "rental yield", "yield", "guaranteed", "guarantee", "capital appreciation", "appreciation", "risk-free", "risk free", "discount", "golden visa", "price will rise", "prices will rise", "best investment"]
+}
