@@ -97,6 +97,7 @@
  ]
 }
 </script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -119,7 +120,14 @@
     <span>Aurelle Residence</span>
     <small>Al Furjan · Dubai</small>
   </div>
+  <div class="loader__count" aria-hidden="true"><b id="loaderPct">00</b><i><em id="loaderBar"></em></i></div>
 </div>
+
+<!-- chapter-jump curtain: far jumps happen behind it instead of scrubbing through the films -->
+<div class="curtain" id="curtain" aria-hidden="true">
+  <svg class="emblem curtain__mark" viewBox="-2 6 104 128"><path d="M10 130V50a40 40 0 0 1 80 0v80"/><path d="M12 130 50 10l38 120M26 130l24-82 24 82M12 130h14m48 0h14M24 92h52"/></svg>
+</div>
+<div class="grain" aria-hidden="true"></div>
 
 <!-- ============ FIXED UI ============ -->
 <header class="hdr" id="hdr">
@@ -214,6 +222,7 @@
 <!-- Explorer overlay: floor + unit views -->
 <div class="explorer" id="explorer" aria-hidden="true">
   <div class="explorer__bg" style="background-image:url(assets/img/tower-dusk.webp)"></div>
+  <div class="explorer__dim"></div>
   <div class="explorer__grid"></div>
 
   <div class="floor" id="floorView">
@@ -322,25 +331,25 @@
   </header>
   <div class="arches">
     <article class="arch-card" data-room="living">
-      <div class="arch"><img src="assets/img/room-living.webp" srcset="assets/img/room-living-1600.webp 1600w, assets/img/room-living.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Living room"></div>
+      <div class="arch"><img src="assets/img/room-living.webp" srcset="assets/img/room-living-1600.webp 1600w, assets/img/room-living.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Living room" loading="lazy" decoding="async"></div>
       <p class="arch-card__num">01</p>
       <h3 class="serif">The Living Room</h3>
       <a class="eyebrow link">Step inside →</a>
     </article>
     <article class="arch-card" data-room="kitchen">
-      <div class="arch"><img src="assets/img/room-kitchen.webp" srcset="assets/img/room-kitchen-1600.webp 1600w, assets/img/room-kitchen.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Kitchen"></div>
+      <div class="arch"><img src="assets/img/room-kitchen.webp" srcset="assets/img/room-kitchen-1600.webp 1600w, assets/img/room-kitchen.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Kitchen" loading="lazy" decoding="async"></div>
       <p class="arch-card__num">02</p>
       <h3 class="serif">The Kitchen</h3>
       <a class="eyebrow link">Explore the kitchen →</a>
     </article>
     <article class="arch-card" data-room="bedroom">
-      <div class="arch"><img src="assets/img/room-bedroom.webp" srcset="assets/img/room-bedroom-1600.webp 1600w, assets/img/room-bedroom.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Bedroom"></div>
+      <div class="arch"><img src="assets/img/room-bedroom.webp" srcset="assets/img/room-bedroom-1600.webp 1600w, assets/img/room-bedroom.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Bedroom" loading="lazy" decoding="async"></div>
       <p class="arch-card__num">03</p>
       <h3 class="serif">The Bedroom</h3>
       <a class="eyebrow link">Step inside →</a>
     </article>
     <article class="arch-card" data-room="bathroom">
-      <div class="arch"><img src="assets/img/room-bathroom.webp" srcset="assets/img/room-bathroom-1600.webp 1600w, assets/img/room-bathroom.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Bathroom"></div>
+      <div class="arch"><img src="assets/img/room-bathroom.webp" srcset="assets/img/room-bathroom-1600.webp 1600w, assets/img/room-bathroom.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Bathroom" loading="lazy" decoding="async"></div>
       <p class="arch-card__num">04</p>
       <h3 class="serif">The Bathroom</h3>
       <a class="eyebrow link">Discover the bath →</a>
@@ -395,28 +404,28 @@
           <p class="wp__copy">A curated collection of spaces for movement, stillness, and everything in between.</p>
           <p class="eyebrow wp__hint">Scroll to wander <span>→</span></p>
         </div>
-        <div class="arch wp__arch"><img src="assets/img/garden-vertical.webp" srcset="assets/img/garden-vertical-1600.webp 1600w, assets/img/garden-vertical.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Zen garden"></div>
+        <div class="arch wp__arch"><img src="assets/img/garden-vertical.webp" srcset="assets/img/garden-vertical-1600.webp 1600w, assets/img/garden-vertical.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Zen garden" loading="lazy" decoding="async"></div>
       </div>
       <div class="wp wp--ch">
-        <div class="wp__frame wp__frame--lg"><img src="assets/img/yoga.webp" srcset="assets/img/yoga-1600.webp 1600w, assets/img/yoga.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Yoga studio"></div>
+        <div class="wp__frame wp__frame--lg"><img src="assets/img/yoga.webp" srcset="assets/img/yoga-1600.webp 1600w, assets/img/yoga.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Yoga studio" loading="lazy" decoding="async"></div>
         <div class="wp__text">
           <p class="eyebrow wp__num">02 — Yoga &amp; Zen</p>
           <h2 class="display wp__h">Find your <em>balance.</em></h2>
           <p class="wp__copy">A little movement. A moment of stillness. Soft light and sprung floors, morning to night.</p>
-          <div class="wp__frame wp__frame--sm"><img src="assets/img/track.webp" srcset="assets/img/track-1600.webp 1600w, assets/img/track.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Walking track"></div>
+          <div class="wp__frame wp__frame--sm"><img src="assets/img/track.webp" srcset="assets/img/track-1600.webp 1600w, assets/img/track.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Walking track" loading="lazy" decoding="async"></div>
         </div>
       </div>
       <div class="wp wp--ch">
-        <div class="wp__frame wp__frame--lg"><img src="assets/img/gym.webp" srcset="assets/img/gym-1600.webp 1600w, assets/img/gym.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Gym"></div>
+        <div class="wp__frame wp__frame--lg"><img src="assets/img/gym.webp" srcset="assets/img/gym-1600.webp 1600w, assets/img/gym.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Gym" loading="lazy" decoding="async"></div>
         <div class="wp__text">
           <p class="eyebrow wp__num">03 — The Gym</p>
           <h2 class="display wp__h">Room <em>to move.</em></h2>
           <p class="wp__copy">Equipped for every routine, open whenever you are, with the skyline as your mirror.</p>
-          <div class="wp__frame wp__frame--sm"><img src="assets/img/gym-equipment.webp" srcset="assets/img/gym-equipment-1600.webp 1600w, assets/img/gym-equipment.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Gym equipment"></div>
+          <div class="wp__frame wp__frame--sm"><img src="assets/img/gym-equipment.webp" srcset="assets/img/gym-equipment-1600.webp 1600w, assets/img/gym-equipment.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Gym equipment" loading="lazy" decoding="async"></div>
         </div>
       </div>
       <div class="wp wp--full">
-        <div class="wp__frame wp__frame--full"><img src="assets/img/sauna.webp" srcset="assets/img/sauna-1600.webp 1600w, assets/img/sauna.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Steam room">
+        <div class="wp__frame wp__frame--full"><img src="assets/img/sauna.webp" srcset="assets/img/sauna-1600.webp 1600w, assets/img/sauna.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Steam room" loading="lazy" decoding="async">
           <div class="wp__over">
             <p class="eyebrow wp__num">04 — The Steam Room</p>
             <h2 class="display wp__h">Time to <em>exhale.</em></h2>
@@ -425,7 +434,7 @@
         </div>
       </div>
       <div class="wp wp--end">
-        <div class="arch wp__arch"><img src="assets/img/jacuzzi.webp" srcset="assets/img/jacuzzi-1600.webp 1600w, assets/img/jacuzzi.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Jacuzzi"></div>
+        <div class="arch wp__arch"><img src="assets/img/jacuzzi.webp" srcset="assets/img/jacuzzi-1600.webp 1600w, assets/img/jacuzzi.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Jacuzzi" loading="lazy" decoding="async"></div>
         <div class="wp__text">
           <p class="eyebrow wp__num">05 — Open-sky Jacuzzi</p>
           <h2 class="display wp__h">Simply <em>be.</em></h2>
@@ -446,7 +455,7 @@
     <div class="water__img" style="background-image:url(assets/img/pool-person.webp)"></div>
     <div class="water__shade"></div>
     <p class="eyebrow water__eyebrow">— By the water</p>
-    <h2 class="display water__h split"><span class="l1">Nothing to do.</span> <em class="l2">Everything to feel.</em></h2>
+    <h2 class="display water__h"><span class="l1">Nothing to do.</span> <em class="l2">Everything to feel.</em></h2>
     <button class="hotspot" style="left:63%;top:66%"><i></i>The pool</button>
     <p class="eyebrow water__foot">All-weather pool · Podium level</p>
     <div class="water__reveal">
@@ -454,10 +463,10 @@
       <p class="eyebrow">The pleasure of pause</p>
       <h2 class="display">Less rush.<br><em>More Aurelle.</em></h2>
       <span class="mono">A.</span>
-      <img class="water__thumb" src="assets/img/skyline-small.webp" srcset="assets/img/skyline-small-1600.webp 1600w, assets/img/skyline-small.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="">
+      <img class="water__thumb" src="assets/img/skyline-small.webp" srcset="assets/img/skyline-small-1600.webp 1600w, assets/img/skyline-small.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="" loading="lazy" decoding="async">
     </div>
     <div class="water__next" aria-hidden="true">
-      <img src="assets/img/terrace.webp" srcset="assets/img/terrace-1600.webp 1600w, assets/img/terrace.webp 2560w" sizes="100vw" alt="">
+      <img src="assets/img/terrace.webp" srcset="assets/img/terrace-1600.webp 1600w, assets/img/terrace.webp 2560w" sizes="100vw" alt="" loading="lazy" decoding="async">
       <p class="eyebrow water__next-label"><span class="dim">04</span><i class="dash"></i>The open terrace</p>
     </div>
   </div>
@@ -466,7 +475,7 @@
 <!-- ============ 08 ABOVE THE EVERYDAY ============ -->
 <section class="above" data-theme="dark" data-chapter="08">
   <div class="above__pin">
-    <div class="above__frame"><img src="assets/img/terrace.webp" srcset="assets/img/terrace-1600.webp 1600w, assets/img/terrace.webp 2560w" sizes="100vw" alt=""></div>
+    <div class="above__frame"><img src="assets/img/terrace.webp" srcset="assets/img/terrace-1600.webp 1600w, assets/img/terrace.webp 2560w" sizes="100vw" alt="" loading="lazy" decoding="async"></div>
     <h2 class="display above__h">Above the<br><em>everyday.</em></h2>
     <p class="above__copy">A table for friends.<br>An afternoon that lingers.</p>
     <p class="eyebrow above__tag">Space to gather,<br>time to connect</p>
@@ -482,8 +491,8 @@
     <ul class="gen__tags eyebrow"><li>Kids play area</li><li>Kids swimming pool</li><li>Family lounge</li></ul>
   </div>
   <div class="gen__art">
-    <div class="arch gen__arch"><img src="assets/img/kids-play.webp" srcset="assets/img/kids-play-1600.webp 1600w, assets/img/kids-play.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Kids play area"></div>
-    <figure class="gen__portrait"><img src="assets/img/family.webp" srcset="assets/img/family-1600.webp 1600w, assets/img/family.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Family at home"><figcaption class="eyebrow dim">Little moments, lasting memories</figcaption></figure>
+    <div class="arch gen__arch"><img src="assets/img/kids-play.webp" srcset="assets/img/kids-play-1600.webp 1600w, assets/img/kids-play.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Kids play area" loading="lazy" decoding="async"></div>
+    <figure class="gen__portrait"><img src="assets/img/family.webp" srcset="assets/img/family-1600.webp 1600w, assets/img/family.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Family at home" loading="lazy" decoding="async"><figcaption class="eyebrow dim">Little moments, lasting memories</figcaption></figure>
   </div>
   <p class="gen__ghost display" aria-hidden="true">together.</p>
 </section>
@@ -496,10 +505,10 @@
       <h2 class="display home__h">The luxury of <em>coming home.</em></h2>
     </header>
     <div class="home__row">
-      <figure class="hf hf--side hf--l"><img src="assets/img/home-1.webp" srcset="assets/img/home-1-1600.webp 1600w, assets/img/home-1.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Dining"><figcaption class="eyebrow dim">Dining · Level 12</figcaption></figure>
-      <figure class="hf hf--side hf--r"><img src="assets/img/home-2.webp" srcset="assets/img/home-2-1600.webp 1600w, assets/img/home-2.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Bedroom"><figcaption class="eyebrow dim">Master suite</figcaption></figure>
+      <figure class="hf hf--side hf--l"><img src="assets/img/home-1.webp" srcset="assets/img/home-1-1600.webp 1600w, assets/img/home-1.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Dining" loading="lazy" decoding="async"><figcaption class="eyebrow dim">Dining · Level 12</figcaption></figure>
+      <figure class="hf hf--side hf--r"><img src="assets/img/home-2.webp" srcset="assets/img/home-2-1600.webp 1600w, assets/img/home-2.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Bedroom" loading="lazy" decoding="async"><figcaption class="eyebrow dim">Master suite</figcaption></figure>
     </div>
-    <div class="hf hf--main"><img src="assets/img/home-3.webp" srcset="assets/img/home-3-1600.webp 1600w, assets/img/home-3.webp 2560w" sizes="100vw" alt="Apartment at dusk"></div>
+    <div class="hf hf--main"><img src="assets/img/home-3.webp" srcset="assets/img/home-3-1600.webp 1600w, assets/img/home-3.webp 2560w" sizes="100vw" alt="Apartment at dusk" loading="lazy" decoding="async"></div>
     <div class="home__end">
       <p class="eyebrow">Residential bliss</p>
       <p class="serif">Natural light. Thoughtful spaces.<br>A life that feels like you.</p>
@@ -512,7 +521,7 @@
   <div class="life__left">
     <p class="eyebrow"><span class="dim">08</span><i class="dash"></i>Living essentials</p>
     <h2 class="display split">Life, <em>considered.</em></h2>
-    <img class="life__img" src="assets/img/detail-kitchen.webp" srcset="assets/img/detail-kitchen-1600.webp 1600w, assets/img/detail-kitchen.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="">
+    <img class="life__img" src="assets/img/detail-kitchen.webp" srcset="assets/img/detail-kitchen-1600.webp 1600w, assets/img/detail-kitchen.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="" loading="lazy" decoding="async">
     <p class="serif life__note">The thoughtful details<br>that make a home.</p>
   </div>
   <ul class="life__specs">
@@ -549,7 +558,7 @@
       <p class="lead">The podium level, drawn as it is built.</p>
     </header>
     <div class="podium__map">
-      <img src="assets/img/podium-top.webp" srcset="assets/img/podium-top-1600.webp 1600w, assets/img/podium-top.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Podium level plan">
+      <img src="assets/img/podium-top.webp" srcset="assets/img/podium-top-1600.webp 1600w, assets/img/podium-top.webp 2560w" sizes="(max-width: 860px) 90vw, 50vw" alt="Podium level plan" loading="lazy" decoding="async">
       <span class="pin" style="left:22%;top:38%">Adults swimming pool</span>
       <span class="pin" style="left:48%;top:20%">Kids pool</span>
       <span class="pin" style="left:70%;top:30%">Padel court</span>
@@ -608,10 +617,10 @@
 <div class="enq" id="enq" role="dialog" aria-modal="true" aria-labelledby="enqTitle" aria-hidden="true">
   <div class="enq__veil"></div>
   <div class="enq__media">
-    <img src="assets/img/lobby.webp" srcset="assets/img/lobby-1600.webp 1600w, assets/img/lobby.webp 2560w" sizes="45vw" alt="">
+    <img src="assets/img/lobby.webp" srcset="assets/img/lobby-1600.webp 1600w, assets/img/lobby.webp 2560w" sizes="45vw" alt="" loading="lazy" decoding="async">
     <div class="enq__media-text"><svg class="emblem" viewBox="-2 6 104 128" aria-hidden="true"><path d="M10 130V50a40 40 0 0 1 80 0v80"/><path d="M12 130 50 10l38 120M26 130l24-82 24 82M12 130h14m48 0h14M24 92h52"/></svg><p class="eyebrow">Aurelle Residence · Al Furjan, Dubai</p></div>
   </div>
-  <div class="enq__panel">
+  <div class="enq__panel" data-lenis-prevent>
     <button class="enq__close eyebrow" id="enqClose">Close ×</button>
     <div class="enq__body">
       <p class="eyebrow dim" id="enqEyebrow">Private viewing</p>
@@ -684,9 +693,10 @@
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" integrity="sha384-B2WBjDzEjJpYvhmi2UyEn7rektqkf5suS6sNoyyrf0EBAwBHdkiXxIlU0V5Ru2ed" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" integrity="sha384-XmJ9SoHtVOHoQUcKvFAzVXwdkKo1Ie3bhmSoIAkcdsHGaIrVJIkmozyq0FJeb/Ly" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" integrity="sha384-wl5TeDVvOWt30Pbf8aSo2ZrzsOjddu3avOBvHe+p+OhJt9gP6w9YXmDkN5DK2/dF" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/SplitText.min.js" integrity="sha384-SWJ0lLVRoipvHh59xj0pL7uC7Ih51F+5smaFtrG+2nr+TlDZU5SYJHmxfolbeNTr" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.27/dist/lenis.min.js" integrity="sha384-R18XzqnxvVLEF+BYfhpmDx30v7eP83fAckyfoRzK7/Uf6nGqufcmsk0eAKo7S3RU" crossorigin="anonymous"></script>
 <script src="js/config.js"></script>
 <script src="js/sequence.js"></script>
 <script src="js/plates.js"></script>

@@ -148,7 +148,7 @@
       gsap.set('#plateImg', { filter: 'none' });
       gsap.timeline()
         .add(() => { this.busy = false; }, 1.15) // units clickable as soon as the plate has landed
-        .fromTo('.explorer__bg', { filter: 'brightness(1) saturate(1)' }, { filter: 'brightness(.22) saturate(.6)', duration: 1, ease: 'power2.inOut' }, 0)
+        .fromTo('.explorer__dim', { opacity: 0 }, { opacity: 1, duration: 1, ease: 'power2.inOut' }, 0)
         .fromTo('.explorer__grid', { opacity: 0 }, { opacity: 1, duration: .8 }, .3)
         .fromTo(this.plateEl,
           { y: fromY, rotateX: 74, scale: .46, opacity: 0 },
@@ -183,7 +183,7 @@
         .to('#floorView .xp-head > *, .plate__tag, #floorCaption, #rulerXp', { opacity: 0, duration: .3 })
         .to(this.plateEl, { rotateX: 74, scale: .46, opacity: 0, duration: .9, ease: 'expo.in' }, 0)
         .to('.explorer__grid', { opacity: 0, duration: .5 }, .2)
-        .to('.explorer__bg', { filter: 'brightness(1) saturate(1)', duration: .7 }, .3)
+        .to('.explorer__dim', { opacity: 0, duration: .7 }, .3)
         .to(this.root, { opacity: 0, duration: .3 }, .75);
     },
 
